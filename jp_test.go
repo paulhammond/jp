@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-var compact = `{"foo":"bar","empty":{},"sub":{"a":"b","c":"d","array":[1,2,3],"array":[]}}`
+var compact = `{"foo":"Iñtërnâtiônàlizætiøn","empty":{},"sub":{"ñ":"\u00F1","n˜":"n\u0303","array":[1,2,3],"array":[]}}`
 var pretty = `{
-  "foo": "bar",
+  "foo": "Iñtërnâtiônàlizætiøn",
   "empty": { },
   "sub": {
-    "a": "b",
-    "c": "d",
+    "ñ": "\u00F1",
+    "n˜": "n\u0303",
     "array": [
       1,
       2,
@@ -22,8 +22,8 @@ var pretty = `{
   }
 }`
 var extraspaces = `{
-	"foo":  "bar"  ,     "empty"    : {  }
-,"sub":  {"a"  :  "b"  ,"c":"d","array" : [  1,   2, 3 ]  
+	"foo":  "Iñtërnâtiônàlizætiøn"  ,     "empty"    : {  }
+,"sub":  {"ñ"  :  "\u00F1"  ,"n˜":"n\u0303","array" : [  1,   2, 3 ]  
 ,"array":[
 ]  }
   }  
