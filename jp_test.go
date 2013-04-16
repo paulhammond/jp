@@ -31,16 +31,20 @@ var extraspaces = `{
 
 func TestExpand(t *testing.T) {
 	tests := []struct {
-		in  string
-		out string
+		in     string
+		out    string
+		format string
 	}{
-		{compact, pretty},
-		{extraspaces, pretty},
+		{compact, pretty, "pretty"},
+		{extraspaces, pretty, "pretty"},
+		{pretty, pretty, "pretty"},
+		{compact, compact, "compact"},
+		{extraspaces, compact, "compact"},
 	}
 	for _, test := range tests {
 		r := strings.NewReader(test.in)
 		w := &bytes.Buffer{}
-		err := Expand(r, w)
+		err := Expand(r, w, test.format)
 		if err != nil {
 			t.Fatalf("unexpected error %v", err)
 		}

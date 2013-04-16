@@ -12,6 +12,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "usage: jp [file]\n")
 		flag.PrintDefaults()
 	}
+	format := flag.String("format", "pretty", "output format")
 
 	flag.Parse()
 	args := flag.Args()
@@ -32,7 +33,7 @@ func main() {
 		}
 	}
 
-	e = jp.Expand(fd, os.Stdout)
+	e = jp.Expand(fd, os.Stdout, *format)
 	if e != nil {
 		fmt.Fprintln(os.Stderr, "Error:", e)
 		os.Exit(1)

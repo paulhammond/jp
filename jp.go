@@ -2,15 +2,35 @@ package jp
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"strings"
 	"unicode"
 )
 
+type dict struct {
+	objEmpty string
+	objOpen  string
+	objClose string
+	arrEmpty string
+	arrOpen  string
+	arrClose string
+	colon    string
+	comma    string
+	strOpen  string
+	strClose string
+}
+
+var dicts = map[string]dict{
+	"pretty":  {"{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`},
+	"compact": {"{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`},
+}
+
 type scanner struct {
 	r      *bufio.Reader
 	w      *bufio.Writer
 	indent int
+	dict   dict
 }
 
 func (s scanner) writeRune(r rune) (e error) {
@@ -41,7 +61,7 @@ func (s scanner) read() (r rune, e error) {
 func (s scanner) copyString() (e error) {
 	var r rune
 	var last rune
-	e = s.writeString(`"`)
+	e = s.writeString(s.dict.strOpen)
 loop:
 	for e == nil {
 		r, _, e = s.r.ReadRune()
@@ -54,7 +74,7 @@ loop:
 			if last == '\\' {
 				e = s.writeRune(r)
 			} else {
-				e = s.writeString(`"`)
+				e = s.writeString(s.dict.strClose)
 				break loop
 			}
 		default:
@@ -79,40 +99,40 @@ func (s scanner) expand() (e error) {
 				break
 			}
 			if r == '}' {
-				e = s.writeString("{ }")
+				e = s.writeString(s.dict.objEmpty)
 			} else {
 				e = s.r.UnreadRune()
 				if e != nil {
 					break // this really shouldn't happen
 				}
 				s.indent++
-				e = s.writeIndented("{\n")
+				e = s.writeIndented(s.dict.objOpen)
 			}
 		case '}':
 			s.indent--
-			e = s.writeIndented("\n}")
+			e = s.writeIndented(s.dict.objClose)
 		case '[':
 			r, e = s.read()
 			if e != nil {
 				break
 			}
 			if r == ']' {
-				e = s.writeString("[ ]")
+				e = s.writeString(s.dict.arrEmpty)
 			} else {
 				e = s.r.UnreadRune()
 				if e != nil {
 					break // this really shouldn't happen
 				}
 				s.indent++
-				e = s.writeIndented("[\n")
+				e = s.writeIndented(s.dict.arrOpen)
 			}
 		case ']':
 			s.indent--
-			e = s.writeIndented("\n]")
+			e = s.writeIndented(s.dict.arrClose)
 		case ',':
-			e = s.writeIndented(",\n")
+			e = s.writeIndented(s.dict.comma)
 		case ':':
-			e = s.writeString(": ")
+			e = s.writeString(s.dict.colon)
 		case '"':
 			e = s.copyString()
 		// todo unicode.ReplacementChar
@@ -127,10 +147,15 @@ func (s scanner) expand() (e error) {
 	return e
 }
 
-func Expand(reader io.Reader, writer io.Writer) error {
+func Expand(reader io.Reader, writer io.Writer, format string) error {
+	d, ok := dicts[format]
+	if !ok {
+		return errors.New("unknown format")
+	}
 	s := &scanner{
-		r: bufio.NewReader(reader),
-		w: bufio.NewWriter(writer),
+		r:    bufio.NewReader(reader),
+		w:    bufio.NewWriter(writer),
+		dict: d,
 	}
 	return s.expand()
 }
