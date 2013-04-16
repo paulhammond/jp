@@ -62,23 +62,20 @@ func (s scanner) copyString() (e error) {
 	var r rune
 	var last rune
 	e = s.writeString(s.dict.strOpen)
-loop:
 	for e == nil {
 		r, _, e = s.r.ReadRune()
 		if e != nil {
 			break
 		}
 
-		switch r {
-		case '"':
-			if last == '\\' {
-				e = s.writeRune(r)
-			} else {
-				e = s.writeString(s.dict.strClose)
-				break loop
-			}
-		default:
+		if r == '"' && last != '\\' {
+			e = s.writeString(s.dict.strClose)
+			break
+		} else if last != '\\' {
 			last = r
+			e = s.writeRune(r)
+		} else {
+			last = 0
 			e = s.writeRune(r)
 		}
 	}

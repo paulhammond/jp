@@ -39,7 +39,9 @@ func TestExpand(t *testing.T) {
 		{extraspaces, pretty, "pretty"},
 		{pretty, pretty, "pretty"},
 		{compact, compact, "compact"},
-		{extraspaces, compact, "compact"},
+		// this checks for an edge cases in strings
+		{`{"slash\\" : "foo" }`, `{"slash\\":"foo"}`, "compact"},
+		{`{"" : "foo" }`, `{"":"foo"}`, "compact"},
 	}
 	for _, test := range tests {
 		r := strings.NewReader(test.in)
