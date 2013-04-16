@@ -22,7 +22,8 @@ var pretty = `{
     ],
     "array": [ ]
   }
-}`
+}
+`
 var extraspaces = `{
 	"foo":  "Iñtërnâtiônàlizætiøn"  ,     "empty"    : {  }
 ,"sub":  {"ñ"  :  "\u00F1"  ,"n˜":"n\u0303","array" : [  1,   2, 3 ]  

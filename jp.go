@@ -20,11 +20,12 @@ type dict struct {
 	comma    string
 	strOpen  string
 	strClose string
+	end      string
 }
 
 var dicts = map[string]dict{
-	"pretty":  {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`},
-	"compact": {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`},
+	"pretty":  {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`, "\n"},
+	"compact": {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`, ""},
 }
 
 func (d dict) indent() dict {
@@ -40,6 +41,7 @@ func (d dict) indent() dict {
 		strings.Replace(d.comma   , "\n", d.indented, 1),
 		strings.Replace(d.strOpen , "\n", d.indented, 1),
 		strings.Replace(d.strClose, "\n", d.indented, 1),
+		d.end,
 	}
 }
 
@@ -158,6 +160,7 @@ func (s scanner) expand() (e error) {
 			e = s.writeRune(r)
 		}
 	}
+	s.writeString(s.dict.end)
 	s.w.Flush()
 	if e == io.EOF {
 		return nil
