@@ -2,6 +2,8 @@ package jp
 
 import (
 	"bytes"
+	"os"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -54,4 +56,22 @@ func TestExpand(t *testing.T) {
 			t.Errorf("unexpected JSON, got\n%s\nexpected\n%s", w.String(), test.out)
 		}
 	}
+}
+
+// This benchmark isn't run by default. To run it, create "bench.json", then:
+// go test -c .
+// ./jp.test -test.bench="Expand" -test.cpuprofile cpu.out -test.benchtime=5 2> tmp.out
+// go tool pprof jp.test cpu.out
+func BenchmarkExpand(b *testing.B) {
+	b.StopTimer()
+	var r, _ = os.Open("./bench.json")
+	var w = os.Stderr
+	b.StartTimer()
+	var err error
+	for i := 0; i < b.N; i++ {
+		err = Expand(r, w, "pretty")
+	}
+	b.StopTimer()
+	fmt.Println(err)
+	b.StartTimer()
 }

@@ -9,6 +9,7 @@ import (
 )
 
 type dict struct {
+	indented string
 	objEmpty string
 	objOpen  string
 	objClose string
@@ -22,15 +23,32 @@ type dict struct {
 }
 
 var dicts = map[string]dict{
-	"pretty":  {"{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`},
-	"compact": {"{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`},
+	"pretty":  {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`},
+	"compact": {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`},
+}
+
+func (d dict) indent() dict {
+	return dict{
+		d.indented,
+		strings.Replace(d.objEmpty, "\n", d.indented, 1),
+		strings.Replace(d.objOpen , "\n", d.indented, 1),
+		strings.Replace(d.objClose, "\n", d.indented, 1),
+		strings.Replace(d.arrEmpty, "\n", d.indented, 1),
+		strings.Replace(d.arrOpen , "\n", d.indented, 1),
+		strings.Replace(d.arrClose, "\n", d.indented, 1),
+		strings.Replace(d.colon   , "\n", d.indented, 1),
+		strings.Replace(d.comma   , "\n", d.indented, 1),
+		strings.Replace(d.strOpen , "\n", d.indented, 1),
+		strings.Replace(d.strClose, "\n", d.indented, 1),
+	}
 }
 
 type scanner struct {
 	r      *bufio.Reader
 	w      *bufio.Writer
-	indent int
-	dict   dict
+	indentSize int
+	indentDicts []dict
+	dict   *dict
 }
 
 func (s scanner) writeRune(r rune) (e error) {
@@ -43,9 +61,12 @@ func (s scanner) writeString(str string) (e error) {
 	return e
 }
 
-func (s scanner) writeIndented(str string) (e error) {
-	indent := "\n" + strings.Repeat("  ", s.indent)
-	return s.writeString(strings.Replace(str, "\n", indent, 1))
+func (s *scanner) indent(d int) {
+	s.indentSize += d
+	if len(s.indentDicts) <= s.indentSize {
+		s.indentDicts = append(s.indentDicts, s.indentDicts[len(s.indentDicts)-1].indent())
+	}
+	s.dict = &s.indentDicts[s.indentSize]
 }
 
 func (s scanner) read() (r rune, e error) {
@@ -102,12 +123,12 @@ func (s scanner) expand() (e error) {
 				if e != nil {
 					break // this really shouldn't happen
 				}
-				s.indent++
-				e = s.writeIndented(s.dict.objOpen)
+				s.indent(1)
+				e = s.writeString(s.dict.objOpen)
 			}
 		case '}':
-			s.indent--
-			e = s.writeIndented(s.dict.objClose)
+			s.indent(-1)
+			e = s.writeString(s.dict.objClose)
 		case '[':
 			r, e = s.read()
 			if e != nil {
@@ -120,14 +141,14 @@ func (s scanner) expand() (e error) {
 				if e != nil {
 					break // this really shouldn't happen
 				}
-				s.indent++
-				e = s.writeIndented(s.dict.arrOpen)
+				s.indent(1)
+				e = s.writeString(s.dict.arrOpen)
 			}
 		case ']':
-			s.indent--
-			e = s.writeIndented(s.dict.arrClose)
+			s.indent(-1)
+			e = s.writeString(s.dict.arrClose)
 		case ',':
-			e = s.writeIndented(s.dict.comma)
+			e = s.writeString(s.dict.comma)
 		case ':':
 			e = s.writeString(s.dict.colon)
 		case '"':
@@ -149,10 +170,12 @@ func Expand(reader io.Reader, writer io.Writer, format string) error {
 	if !ok {
 		return errors.New("unknown format")
 	}
+	indentDicts := []dict{d}
 	s := &scanner{
-		r:    bufio.NewReader(reader),
-		w:    bufio.NewWriter(writer),
-		dict: d,
+		r: bufio.NewReader(reader),
+		w: bufio.NewWriter(writer),
+		indentDicts: indentDicts,
+		dict: &indentDicts[0],
 	}
 	return s.expand()
 }
