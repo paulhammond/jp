@@ -21,6 +21,13 @@ var pretty = `{
     "array": [ ]
   }
 }`
+var extraspaces = `{
+	"foo":  "bar"  ,     "empty"    : {  }
+,"sub":  {"a"  :  "b"  ,"c":"d","array" : [  1,   2, 3 ]  
+,"array":[
+]  }
+  }  
+`
 
 func TestExpand(t *testing.T) {
 	tests := []struct {
@@ -28,6 +35,7 @@ func TestExpand(t *testing.T) {
 		out string
 	}{
 		{compact, pretty},
+		{extraspaces, pretty},
 	}
 	for _, test := range tests {
 		r := strings.NewReader(test.in)

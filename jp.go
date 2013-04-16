@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"strings"
+	"unicode"
 )
 
 type scanner struct {
@@ -27,8 +28,13 @@ func (s scanner) writeIndented(str string) (e error) {
 	return s.writeString(strings.Replace(str, "\n", indent, 1))
 }
 
-func (s scanner) readRune() (r rune, e error) {
-	r, _, e = s.r.ReadRune()
+func (s scanner) read() (r rune, e error) {
+	for e == nil {
+		r, _, e = s.r.ReadRune()
+		if !unicode.IsSpace(r) {
+			break
+		}
+	}
 	return r, e
 }
 
@@ -38,7 +44,7 @@ func (s scanner) copyString() (e error) {
 	e = s.writeString(`"`)
 loop:
 	for e == nil {
-		r, e = s.readRune()
+		r, _, e = s.r.ReadRune()
 		if e != nil {
 			break
 		}
@@ -62,13 +68,13 @@ loop:
 func (s scanner) expand() (e error) {
 	var r rune
 	for e == nil {
-		r, e = s.readRune()
+		r, e = s.read()
 		if e != nil {
 			break
 		}
 		switch r {
 		case '{':
-			r, e = s.readRune()
+			r, e = s.read()
 			if e != nil {
 				break
 			}
@@ -86,7 +92,7 @@ func (s scanner) expand() (e error) {
 			s.indent--
 			e = s.writeIndented("\n}")
 		case '[':
-			r, e = s.readRune()
+			r, e = s.read()
 			if e != nil {
 				break
 			}
