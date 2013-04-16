@@ -12,13 +12,18 @@ func main() {
 		fmt.Fprintf(os.Stderr, "usage: jp [file]\n")
 		flag.PrintDefaults()
 	}
-	format := flag.String("format", "pretty", "output format")
+	compact := flag.Bool("compact", false, "compact format")
 
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 1 {
 		flag.Usage()
 		os.Exit(2)
+	}
+
+	format := "pretty"
+	if *compact {
+		format = "compact"
 	}
 
 	var fd *os.File
@@ -33,7 +38,7 @@ func main() {
 		}
 	}
 
-	e = jp.Expand(fd, os.Stdout, *format)
+	e = jp.Expand(fd, os.Stdout, format)
 	if e != nil {
 		fmt.Fprintln(os.Stderr, "Error:", e)
 		os.Exit(1)
