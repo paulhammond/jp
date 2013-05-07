@@ -45,9 +45,15 @@ func TestExpand(t *testing.T) {
 		{extraspaces, pretty, "pretty"},
 		{pretty, pretty, "pretty"},
 		{compact, compact, "compact"},
-		// this checks for an edge cases in strings
+		// this checks for an edge case in strings
 		{`{"slash\\" : "foo" }`, `{"slash\\":"foo"}`, "compact"},
 		{`{"" : "foo" }`, `{"":"foo"}`, "compact"},
+		// check invalid spaces between elements are preserved
+		{`{"foo":[1 2, 3]}`, `{"foo":[1 2,3]}`, "compact"},
+		{`{"foo":[1 true, 3]}`, `{"foo":[1 true,3]}`, "compact"},
+		{`{"foo":[true false, 3]}`, `{"foo":[true false,3]}`, "compact"},
+		{`{"foo":[true false]}`, `{"foo":[true false]}`, "compact"},
+		{`{"foo":[true {}]}`, `{"foo":[true{}]}`, "compact"},
 	}
 	for _, test := range tests {
 		r := strings.NewReader(test.in)

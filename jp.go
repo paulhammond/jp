@@ -23,12 +23,15 @@ type dict struct {
 	comma    string
 	strOpen  string
 	strClose string
+	otherSpace string
+	otherOpen  string
+	otherClose string
 	end      string
 }
 
 var dicts = map[string]dict{
-	"pretty":  {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`, "\n"},
-	"compact": {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`, ""},
+	"pretty":  {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`, " ", "", "", "\n"},
+	"compact": {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`,  " ", "", "", ""},
 }
 
 func (d dict) indent() dict {
@@ -44,6 +47,9 @@ func (d dict) indent() dict {
 		strings.Replace(d.comma   , "\n", d.indented, 1),
 		strings.Replace(d.strOpen , "\n", d.indented, 1),
 		strings.Replace(d.strClose, "\n", d.indented, 1),
+		d.otherSpace,
+		strings.Replace(d.otherOpen , "\n", d.indented, 1),
+		strings.Replace(d.otherClose, "\n", d.indented, 1),
 		d.end,
 	}
 }
@@ -108,6 +114,42 @@ func (s scanner) copyString() (e error) {
 	return e
 }
 
+func (s scanner) copyOther() (e error) {
+	var r rune
+	var space bool
+	e = s.writeString(s.dict.otherOpen)
+	for e == nil {
+		r, _, e = s.r.ReadRune()
+		if e != nil {
+			break
+		}
+		switch r {
+		case '{', '}', '[', ']', ',', ':', '"':
+			e = s.r.UnreadRune()
+			if e != nil {
+				return e // this really shouldn't happen
+			}
+			e = s.writeString(s.dict.otherClose)
+			return e
+		default:
+			if unicode.IsSpace(r) {
+				space = true
+				break
+			}
+			if space {
+				space = false
+				e = s.writeString(s.dict.otherSpace)
+				if e != nil {
+					return e
+				}
+			}
+			e = s.writeRune(r)
+		}
+	}
+	return e
+}
+
+
 func (s scanner) expand() (e error) {
 	var r rune
 	for e == nil {
@@ -160,7 +202,11 @@ func (s scanner) expand() (e error) {
 			e = s.copyString()
 		// todo unicode.ReplacementChar
 		default:
-			e = s.writeRune(r)
+			e = s.r.UnreadRune()
+			if e != nil {
+				break // this really shouldn't happen
+			}
+			e = s.copyOther()
 		}
 	}
 	s.writeString(s.dict.end)
