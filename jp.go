@@ -80,6 +80,13 @@ func (s *scanner) indent(d int) {
 	s.dict = &s.indentDicts[s.indentSize]
 }
 
+func (s scanner) unread() {
+	e := s.r.UnreadRune()
+	if e != nil {
+		panic(e.Error()) // we only ever read runes, so this shouldn't happen
+	}
+}
+
 func (s scanner) read() (r rune, e error) {
 	for e == nil {
 		r, _, e = s.r.ReadRune()
@@ -125,10 +132,7 @@ func (s scanner) copyOther() (e error) {
 		}
 		switch r {
 		case '{', '}', '[', ']', ',', ':', '"':
-			e = s.r.UnreadRune()
-			if e != nil {
-				return e // this really shouldn't happen
-			}
+			s.unread()
 			e = s.writeString(s.dict.otherClose)
 			return e
 		default:
@@ -166,10 +170,7 @@ func (s scanner) expand() (e error) {
 			if r == '}' {
 				e = s.writeString(s.dict.objEmpty)
 			} else {
-				e = s.r.UnreadRune()
-				if e != nil {
-					break // this really shouldn't happen
-				}
+				s.unread()
 				s.indent(1)
 				e = s.writeString(s.dict.objOpen)
 			}
@@ -184,10 +185,7 @@ func (s scanner) expand() (e error) {
 			if r == ']' {
 				e = s.writeString(s.dict.arrEmpty)
 			} else {
-				e = s.r.UnreadRune()
-				if e != nil {
-					break // this really shouldn't happen
-				}
+				s.unread()
 				s.indent(1)
 				e = s.writeString(s.dict.arrOpen)
 			}
@@ -202,10 +200,7 @@ func (s scanner) expand() (e error) {
 			e = s.copyString()
 		// todo unicode.ReplacementChar
 		default:
-			e = s.r.UnreadRune()
-			if e != nil {
-				break // this really shouldn't happen
-			}
+			s.unread()
 			e = s.copyOther()
 		}
 	}
