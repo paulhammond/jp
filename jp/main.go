@@ -15,7 +15,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "usage: jp [file]\n")
 		flag.PrintDefaults()
 	}
+
+	isTerminal := isTerminal(os.Stdout)
+
 	compact := flag.Bool("compact", false, "compact format")
+	colors := flag.Bool("color", isTerminal, "colored format")
 
 	flag.Parse()
 	args := flag.Args()
@@ -27,6 +31,9 @@ func main() {
 	format := "pretty"
 	if *compact {
 		format = "compact"
+	}
+	if *colors {
+		format += "16"
 	}
 
 	var fd *os.File
