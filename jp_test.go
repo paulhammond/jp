@@ -5,8 +5,8 @@ package jp
 
 import (
 	"bytes"
-	"os"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 )

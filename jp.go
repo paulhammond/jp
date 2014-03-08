@@ -12,56 +12,56 @@ import (
 )
 
 type dict struct {
-	indented string
-	objEmpty string
-	objOpen  string
-	objClose string
-	arrEmpty string
-	arrOpen  string
-	arrClose string
-	colon    string
-	comma    string
-	strOpen  string
-	strClose string
+	indented   string
+	objEmpty   string
+	objOpen    string
+	objClose   string
+	arrEmpty   string
+	arrOpen    string
+	arrClose   string
+	colon      string
+	comma      string
+	strOpen    string
+	strClose   string
 	otherSpace string
 	otherOpen  string
 	otherClose string
-	end      string
+	end        string
 }
 
 var dicts = map[string]dict{
 	"pretty16":  {"\n  ", "\033[0;32m{ }", "\033[0;32m{\n", "\033[0;32m\n}", "\033[0;32m[ ]", "\033[0;32m[\n", "\033[0;32m\n]", "\033[0;32m: ", "\033[0;32m,\n", "\033[0m\"\033[1m", "\033[0m\"", "\033[0;41m \033[0m\033[1;33m", "\033[1;33m", "", "\n"},
 	"compact16": {"\n", "\033[0;32m{}", "\033[0;32m{", "\033[0;32m}", "\033[0;32m[]", "\033[0;32m[", "\033[0;32m]", "\033[0;32m:", "\033[0;32m,", "\033[0m\"\033[1m", "\033[0m\"", "\033[0;41m \033[0m\033[1;33m", "\033[1;33m", "", ""},
-	"pretty":  {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`, " ", "", "", "\n"},
-	"compact": {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`,  " ", "", "", ""},
+	"pretty":    {"\n  ", "{ }", "{\n", "\n}", "[ ]", "[\n", "\n]", ": ", ",\n", `"`, `"`, " ", "", "", "\n"},
+	"compact":   {"\n", "{}", "{", "}", "[]", "[", "]", ":", ",", `"`, `"`, " ", "", "", ""},
 }
 
 func (d dict) indent() dict {
 	return dict{
 		d.indented,
 		strings.Replace(d.objEmpty, "\n", d.indented, 1),
-		strings.Replace(d.objOpen , "\n", d.indented, 1),
+		strings.Replace(d.objOpen, "\n", d.indented, 1),
 		strings.Replace(d.objClose, "\n", d.indented, 1),
 		strings.Replace(d.arrEmpty, "\n", d.indented, 1),
-		strings.Replace(d.arrOpen , "\n", d.indented, 1),
+		strings.Replace(d.arrOpen, "\n", d.indented, 1),
 		strings.Replace(d.arrClose, "\n", d.indented, 1),
-		strings.Replace(d.colon   , "\n", d.indented, 1),
-		strings.Replace(d.comma   , "\n", d.indented, 1),
-		strings.Replace(d.strOpen , "\n", d.indented, 1),
+		strings.Replace(d.colon, "\n", d.indented, 1),
+		strings.Replace(d.comma, "\n", d.indented, 1),
+		strings.Replace(d.strOpen, "\n", d.indented, 1),
 		strings.Replace(d.strClose, "\n", d.indented, 1),
 		d.otherSpace,
-		strings.Replace(d.otherOpen , "\n", d.indented, 1),
+		strings.Replace(d.otherOpen, "\n", d.indented, 1),
 		strings.Replace(d.otherClose, "\n", d.indented, 1),
 		d.end,
 	}
 }
 
 type scanner struct {
-	r      *bufio.Reader
-	w      *bufio.Writer
-	indentSize int
+	r           *bufio.Reader
+	w           *bufio.Writer
+	indentSize  int
 	indentDicts []dict
-	dict   *dict
+	dict        *dict
 }
 
 func (s scanner) writeRune(r rune) (e error) {
@@ -155,7 +155,6 @@ func (s scanner) copyOther() (e error) {
 	return e
 }
 
-
 func (s scanner) expand() (e error) {
 	var r rune
 	for e == nil {
@@ -221,10 +220,10 @@ func Expand(reader io.Reader, writer io.Writer, format string) error {
 	}
 	indentDicts := []dict{d}
 	s := &scanner{
-		r: bufio.NewReader(reader),
-		w: bufio.NewWriter(writer),
+		r:           bufio.NewReader(reader),
+		w:           bufio.NewWriter(writer),
 		indentDicts: indentDicts,
-		dict: &indentDicts[0],
+		dict:        &indentDicts[0],
 	}
 	return s.expand()
 }
