@@ -6,8 +6,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/paulhammond/jp"
 	"os"
+
+	"code.google.com/p/go.crypto/ssh/terminal"
+	"github.com/paulhammond/jp"
 )
 
 func main() {
@@ -16,7 +18,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	isTerminal := isTerminal(os.Stdout)
+	isTerminal := terminal.IsTerminal(int(os.Stdout.Fd()))
 
 	compact := flag.Bool("compact", false, "compact format")
 	colors := flag.Bool("color", isTerminal, "colored format")
