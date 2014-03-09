@@ -13,12 +13,12 @@ VERSION=${1:-"dev"}
 for DEST in linux-386 linux-amd64 darwin-amd64; do
 	OS=${DEST%-*}
 	ARCH=${DEST#*-}
-	DIR=pkg/$DEST/jp-$VERSION
+	DIR=pkg/build/$DEST/jp-$VERSION
 	mkdir -p $DIR
 	cp README.md $DIR
 	cp LICENSE.txt $DIR
 	GOOS=$OS GOARCH=$ARCH go build -o $DIR/jp github.com/paulhammond/jp/jp
-	cd pkg/$DEST
-	tar -czf ../jp-${VERSION}-${OS}-${ARCH}.tgz jp-$VERSION
-	cd ../..
+	cd pkg/build/$DEST
+	tar -czf ../../jp-${VERSION}-${OS}-${ARCH}.tgz jp-$VERSION
+	cd ../../..
 done
