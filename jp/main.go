@@ -4,11 +4,11 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
 	"code.google.com/p/go.crypto/ssh/terminal"
+	flag "github.com/ogier/pflag"
 	"github.com/paulhammond/jp"
 )
 
