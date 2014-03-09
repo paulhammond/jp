@@ -18,8 +18,15 @@ homepage](http://www.paulhammond.org/jp/).
 
 ## Installing
 
-Download a [precompiled binary](http://www.paulhammond.org/jp/) and
-copy the `jp` file inside to somewhere in your path.
+Using [Homebrew](http://brew.sh/):
+
+```
+brew install https://gist.github.com/paulhammond/9441506/raw/jp.rb
+```
+
+If you don't use Homebrew you can download a
+[precompiled binary](https://github.com/paulhammond/jp/releases) and copy the
+`jp` file inside to somewhere in your path.
 
 Or if you have a working go installation run
 `go get github.com/paulhammond/jp`.
