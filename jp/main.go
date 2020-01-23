@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"code.google.com/p/go.crypto/ssh/terminal"
+	"github.com/mattn/go-isatty"
 	flag "github.com/ogier/pflag"
 	"github.com/paulhammond/jp"
 )
@@ -18,7 +18,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	isTerminal := terminal.IsTerminal(int(os.Stdout.Fd()))
+	isTerminal := isatty.IsTerminal(os.Stdout.Fd())
 
 	compact := flag.Bool("compact", false, "compact format")
 	colors := flag.Bool("color", isTerminal, "colored format")
