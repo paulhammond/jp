@@ -12,8 +12,8 @@
       ]
     }
 
-It is insanely fast, doesn't mess with the data, and handles invalid JSON
-(within reason). For more information see the [project
+It's fast, doesn't mess with the data, and handles invalid JSON (within
+reason). For more information see the [project
 homepage](http://www.paulhammond.org/jp/).
 
 ## Installing
