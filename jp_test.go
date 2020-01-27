@@ -27,6 +27,23 @@ var pretty = `{
   }
 }
 `
+
+var pretty16 = strings.ReplaceAll(`\033[0;32m{
+  \033[0m"\033[1mfoo\033[0m"\033[0;32m: \033[0m"\033[1mIñtërnâtiônàlizætiøn\033[0m"\033[0;32m,
+  \033[0m"\033[1mempty\033[0m"\033[0;32m: \033[0;32m{ }\033[0;32m,
+  \033[0m"\033[1msub\033[0m"\033[0;32m: \033[0;32m{
+    \033[0m"\033[1mñ\033[0m"\033[0;32m: \033[0m"\033[1m\u00F1\033[0m"\033[0;32m,
+    \033[0m"\033[1mn˜\033[0m"\033[0;32m: \033[0m"\033[1mn\u0303\033[0m"\033[0;32m,
+    \033[0m"\033[1marray\033[0m"\033[0;32m: \033[0;32m[
+      \033[1;33m1\033[0;32m,
+      \033[1;33m2\033[0;32m,
+      \033[1;33m3\033[0;32m
+    ]\033[0;32m,
+    \033[0m"\033[1marray\033[0m"\033[0;32m: \033[0;32m[ ]\033[0;32m
+  }\033[0;32m
+}
+`, `\033`, "\033")
+
 var extraspaces = `{
 	"foo":  "Iñtërnâtiônàlizætiøn"  ,     "empty"    : {  }
 ,"sub":  {"ñ"  :  "\u00F1"  ,"n˜":"n\u0303","array" : [  1,   2, 3 ]  
@@ -42,6 +59,7 @@ func TestExpand(t *testing.T) {
 		format string
 	}{
 		{compact, pretty, "pretty"},
+		{compact, pretty16, "pretty16"},
 		{extraspaces, pretty, "pretty"},
 		{pretty, pretty, "pretty"},
 		{compact, compact, "compact"},
@@ -63,9 +81,13 @@ func TestExpand(t *testing.T) {
 			t.Fatalf("unexpected error %v", err)
 		}
 		if w.String() != test.out {
-			t.Errorf("unexpected JSON, got\n%s\nexpected\n%s", w.String(), test.out)
+			t.Errorf("unexpected JSON, got\n%s\nexpected\n%s", escape(w.String()), escape(test.out))
 		}
 	}
+}
+
+func escape(str string) string {
+	return strings.ReplaceAll(str, "\033", "\\033")
 }
 
 // This benchmark isn't run by default. To run it, create "bench.json", then:
