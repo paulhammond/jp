@@ -1,0 +1,77 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+env:
+  GOPRIVATE: "github.com/paulhammond"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v1
+
+      - name: Get tag name
+        id: tagname
+        run: echo ::set-output name=tagname::${GITHUB_REF#refs/tags/}
+
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Restore Go cache
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: release-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            release-go-
+
+      - name: Build Mac binary
+        env:
+          OS: mac
+          REF: ${{ steps.tagname.outputs.tagname }}
+        run: "./.github/workflows/build.sh"
+
+      - name: Build Linux binary
+        env:
+          OS: linux
+          REF: ${{ steps.tagname.outputs.tagname }}
+        run: "./.github/workflows/build.sh"
+
+      - name: Generate SHAs
+        run: "sha256sum *.tgz"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ steps.tagname.outputs.tagname }}
+          draft: true
+          prerelease: false
+
+      - name: Upload Mac binary
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "jp-mac-${{steps.tagname.outputs.tagname}}.tgz"
+          asset_name: "jp-mac-${{steps.tagname.outputs.tagname}}.tgz"
+          asset_content_type: application/gzip
+
+      - name: Upload Linux binary
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "jp-linux-${{steps.tagname.outputs.tagname}}.tgz"
+          asset_name: "jp-linux-${{steps.tagname.outputs.tagname}}.tgz"
+          asset_content_type: application/gzip
