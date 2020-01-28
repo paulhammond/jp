@@ -1,0 +1,41 @@
+name: Build
+on: [push]
+env:
+  GOPRIVATE: "github.com/paulhammond"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: ["mac", "linux"]
+      fail-fast: false
+
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v1
+
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Restore Go cache
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: build-${{ matrix.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            build-${{ matrix.os }}-go-
+
+      - name: Build
+        env:
+          OS: ${{ matrix.os }}
+          REF: ${{ github.sha }}
+        run: "./.github/workflows/build.sh"
+
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: "jp-${{matrix.os}}-${{github.sha}}.tgz"
+          path: "jp-${{matrix.os}}-${{github.sha}}.tgz"
