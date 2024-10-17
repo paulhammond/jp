@@ -5,7 +5,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         os: ["mac", "linux"]
@@ -13,20 +13,12 @@ jobs:
 
     steps:
       - name: Check out source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Set up Go 1.22
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
           go-version: 1.22
-
-      - name: Restore Go cache
-        uses: actions/cache@v1
-        with:
-          path: ~/go/pkg/mod
-          key: build-${{ matrix.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            build-${{ matrix.os }}-go-
 
       - name: Build
         env:
@@ -35,7 +27,7 @@ jobs:
         run: "./.github/workflows/build.sh"
 
       - name: Upload
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: "jp-${{matrix.os}}-${{github.sha}}.tgz"
           path: "jp-${{matrix.os}}-${{github.sha}}.tgz"

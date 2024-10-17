@@ -8,27 +8,19 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Get tag name
         id: tagname
         run: echo ::set-output name=tagname::${GITHUB_REF#refs/tags/}
 
       - name: Set up Go 1.22
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
           go-version: 1.22
-
-      - name: Restore Go cache
-        uses: actions/cache@v1
-        with:
-          path: ~/go/pkg/mod
-          key: release-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            release-go-
 
       - name: Build Mac binary
         env:
