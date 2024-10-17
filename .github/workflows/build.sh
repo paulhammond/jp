@@ -2,16 +2,15 @@
 
 set -ex
 
-DIR=jp-${OS}-${REF}
-rm -rf "$DIR"
-mkdir "$DIR"
+BUILD="build/jp-${REF}"
+mkdir -p "$BUILD"
 
-cp README.md "$DIR"
-
-cp LICENSE.txt "$DIR"
+cp README.md "$BUILD"
+cp LICENSE.txt "$BUILD"
 
 GOOS=${OS}
-[ "$GOOS" = "mac" ] && GOOS=darwin
-GOARCH=amd64 GOOS="$GOOS" go build -o "${DIR}/jp" ./jp
+[ "$GOOS" = "macos" ] && GOOS=darwin
+GOARCH="${ARCH}" GOOS="${GOOS}" go build -o "$BUILD/jp" ./jp
 
-tar -czf "${DIR}.tgz" "$DIR"
+cd build
+tar -czf "jp-${OS}-${ARCH}-${REF}.tgz" "jp-${REF}"
