@@ -6,7 +6,7 @@ BUILD="build/jp-${REF}"
 mkdir -p "$BUILD"
 
 cp README.md "$BUILD"
-cp LICENSE.txt "$BUILD"
+cp LICENSE "$BUILD"
 
 GOOS=${OS}
 [ "$GOOS" = "macos" ] && GOOS=darwin
