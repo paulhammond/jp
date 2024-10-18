@@ -22,8 +22,7 @@ var pretty = `{
     ],
     "array": [ ]
   }
-}
-`
+}`
 
 var pretty16 = strings.ReplaceAll(`\033[0;32m{
   \033[0m"\033[1mfoo\033[0m"\033[0;32m: \033[0m"\033[1mIñtërnâtiônàlizætiøn\033[0m"\033[0;32m,
@@ -38,8 +37,7 @@ var pretty16 = strings.ReplaceAll(`\033[0;32m{
     ]\033[0;32m,
     \033[0m"\033[1marray\033[0m"\033[0;32m: \033[0;32m[ ]\033[0;32m
   }\033[0;32m
-}\033[0m
-`, `\033`, "\033")
+}\033[0m`, `\033`, "\033")
 
 var extraspaces = `{
 	"foo":  "Iñtërnâtiônàlizætiøn"  ,     "empty"    : {  }
@@ -77,8 +75,9 @@ func TestExpand(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error %v", err)
 		}
-		if w.String() != test.out {
-			t.Errorf("unexpected JSON, got\n%s\nexpected\n%s", escape(w.String()), escape(test.out))
+		want := test.out + "\n"
+		if w.String() != want {
+			t.Errorf("unexpected JSON\ngot  %q\nwant %q", escape(w.String()), escape(want))
 		}
 	}
 }
