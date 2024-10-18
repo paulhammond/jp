@@ -1,0 +1,28 @@
+unescape colors.json
+
+# No colors by default
+exec jp --compact input.json
+cmp stdout nocolors.json
+! stderr .
+
+# Add CLICOLOR_FORCE
+env CLICOLOR_FORCE=1
+exec jp --compact input.json
+cmp stdout colors.json
+! stderr .
+
+# Add NO_COLOR
+env NO_COLOR=1
+exec jp --compact input.json
+cmp stdout nocolors.json
+! stderr .
+
+# Can't easily test terminal detection
+-- nocolors.json --
+{"names":["Alice","Bob"]}
+-- colors.json --
+\033[0;32m{\033[0m"\033[1mnames\033[0m"\033[0;32m:\033[0;32m[\033[0m"\033[1mAlice\033[0m"\033[0;32m,\033[0m"\033[1mBob\033[0m"\033[0;32m]\033[0;32m}\033[0m
+-- input.json --
+{ "names" :
+  ["Alice","Bob"]
+}

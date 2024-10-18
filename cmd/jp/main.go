@@ -28,10 +28,8 @@ options:
 		fmt.Fprint(os.Stderr, usage)
 	}
 
-	isTerminal := term.IsTerminal(int(os.Stdout.Fd()))
-
 	compact := flag.Bool("compact", false, "compact format")
-	colors := flag.Bool("color", isTerminal, "force colored output")
+	colors := flag.Bool("color", false, "force colored output")
 	help := flag.BoolP("help", "h", false, "show help text")
 
 	flag.Parse()
@@ -48,7 +46,7 @@ options:
 	if *compact {
 		format = "compact"
 	}
-	if *colors {
+	if useColors(*colors) {
 		format += "16"
 	}
 
@@ -70,4 +68,22 @@ options:
 		return 1
 	}
 	return 0
+}
+
+func useColors(override bool) bool {
+	if override {
+		return true
+	}
+	// https://no-color.org
+	_, noColor := os.LookupEnv("NO_COLOR")
+	if noColor {
+		return false
+	}
+	// https://bixense.com/clicolors/
+	_, forceColor := os.LookupEnv("CLICOLOR_FORCE")
+	if forceColor {
+		return true
+	}
+
+	return term.IsTerminal(int(os.Stdout.Fd()))
 }
