@@ -10,7 +10,7 @@ cp LICENSE "$BUILD"
 
 GOOS=${OS}
 [ "$GOOS" = "macos" ] && GOOS=darwin
-GOARCH="${ARCH}" GOOS="${GOOS}" go build -o "$BUILD/jp" ./jp
+GOARCH="${ARCH}" GOOS="${GOOS}" go build -o "$BUILD/jp" ./cmd/jp
 
 cd build
 tar -czf "jp-${OS}-${ARCH}-${REF}.tgz" "jp-${REF}"
