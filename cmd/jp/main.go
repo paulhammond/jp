@@ -14,21 +14,33 @@ func main() {
 }
 
 func run() int {
+	usage := `jp: a JSON reformatter
+
+usage: jp [options] [file]
+
+options:
+      --color: force colored output (default autodetects)
+      --compact: compact format
+  -h  --help: show this help text
+`
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: jp [file]\n")
-		flag.PrintDefaults()
+		fmt.Fprint(os.Stderr, usage)
 	}
 
 	isTerminal := term.IsTerminal(int(os.Stdout.Fd()))
 
 	compact := flag.Bool("compact", false, "compact format")
-	colors := flag.Bool("color", isTerminal, "colored format")
+	colors := flag.Bool("color", isTerminal, "force colored output")
+	help := flag.BoolP("help", "h", false, "show help text")
 
 	flag.Parse()
 	args := flag.Args()
-	if len(args) < 1 {
+	if len(args) < 1 || *help {
 		flag.Usage()
+		if *help {
+			return 0
+		}
 		return 2
 	}
 

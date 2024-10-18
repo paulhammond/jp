@@ -3,3 +3,15 @@
 ! exec jp
 stderr 'usage: jp'
 ! stdout .
+
+# print usage with --help
+
+exec jp --help
+stderr 'usage: jp'
+! stdout .
+
+# print usage with -h
+
+exec jp -h
+stderr 'usage: jp'
+! stdout .
