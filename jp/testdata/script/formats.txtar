@@ -1,0 +1,44 @@
+unescape pretty-color.json compact-color.json
+
+# pretty
+exec jp input.json
+cmp stdout pretty.json
+! stderr .
+
+# compact
+exec jp --compact input.json
+cmp stdout compact.json
+! stderr .
+
+# pretty-color
+exec jp --color input.json
+cmp stdout pretty-color.json
+! stderr .
+
+# compact-color
+exec jp --color --compact input.json
+cmp stdout compact-color.json
+! stderr .
+
+-- pretty.json --
+{
+  "names": [
+    "Alice",
+    "Bob"
+  ]
+}
+-- compact.json --
+{"names":["Alice","Bob"]}
+-- pretty-color.json --
+\033[0;32m{
+  \033[0m"\033[1mnames\033[0m"\033[0;32m: \033[0;32m[
+    \033[0m"\033[1mAlice\033[0m"\033[0;32m,
+    \033[0m"\033[1mBob\033[0m"\033[0;32m
+  ]\033[0;32m
+}\033[0m
+-- compact-color.json --
+\033[0;32m{\033[0m"\033[1mnames\033[0m"\033[0;32m:\033[0;32m[\033[0m"\033[1mAlice\033[0m"\033[0;32m,\033[0m"\033[1mBob\033[0m"\033[0;32m]\033[0;32m}\033[0m
+-- input.json --
+{ "names" :
+  ["Alice","Bob"]
+}

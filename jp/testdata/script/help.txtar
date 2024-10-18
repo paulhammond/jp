@@ -1,0 +1,5 @@
+# print usage when no args
+
+! exec jp
+stderr 'usage: jp'
+! stdout .

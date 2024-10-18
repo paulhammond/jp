@@ -10,6 +10,11 @@ import (
 )
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
+
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: jp [file]\n")
 		flag.PrintDefaults()
@@ -24,7 +29,7 @@ func main() {
 	args := flag.Args()
 	if len(args) < 1 {
 		flag.Usage()
-		os.Exit(2)
+		return 2
 	}
 
 	format := "pretty"
@@ -43,13 +48,14 @@ func main() {
 		fd, e = os.Open(args[0])
 		if e != nil {
 			fmt.Fprintln(os.Stderr, "Error:", e)
-			os.Exit(1)
+			return 1
 		}
 	}
 
 	e = jp.Expand(fd, os.Stdout, format)
 	if e != nil {
 		fmt.Fprintln(os.Stderr, "Error:", e)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }

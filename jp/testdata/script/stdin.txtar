@@ -1,0 +1,10 @@
+stdin input.json
+exec jp --compact -
+cmp stdout compact.json
+! stderr .
+-- compact.json --
+{"names":["Alice","Bob"]}
+-- input.json --
+{ "names" :
+  ["Alice","Bob"]
+}
