@@ -3,6 +3,7 @@
 set -ex
 
 BUILD="build/jp-${REF}"
+TGZ="jp-${OS}-${ARCH}-${REF}.tgz"
 mkdir -p "$BUILD"
 
 cp README.md "$BUILD"
@@ -13,4 +14,6 @@ GOOS=${OS}
 GOARCH="${ARCH}" GOOS="${GOOS}" go build -o "$BUILD/jp" ./cmd/jp
 
 cd build
-tar -czf "jp-${OS}-${ARCH}-${REF}.tgz" "jp-${REF}"
+tar -czf "${TGZ}" "jp-${REF}"
+
+echo "::notice title=sha256::$(shasum -a 256 "${TGZ}")"
