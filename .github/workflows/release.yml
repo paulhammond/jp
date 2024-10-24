@@ -8,8 +8,19 @@ jobs:
     name: Create Release
     runs-on: ubuntu-24.04
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        # https://github.com/cli/cli/issues/9558
+        with:
+          ref: ${{ github.ref }}
+      - name: Generate Notes
+        run: |
+          mkdir -p build
+          git tag -l --format='%(contents:body)' "${{github.ref_name}}" > build/notes.md
+          echo >> build/notes.md
+          echo "[Build log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> build/notes.md
       - name: Create Release
-        run: gh release create --repo ${{ github.repository }} "${{github.ref_name}}"
+        run: gh release create --notes-file build/notes.md "${{github.ref_name}}"
         env:
           GH_TOKEN: ${{ github.token }}
   build:
