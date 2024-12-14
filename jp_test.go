@@ -61,6 +61,10 @@ func TestExpand(t *testing.T) {
 		// this checks for an edge case in strings
 		{`{"slash\\" : "foo" }`, `{"slash\\":"foo"}`, "compact"},
 		{`{"" : "foo" }`, `{"":"foo"}`, "compact"},
+		// check json inside string isn't expanded
+		{`{"foo":"{\"a\":\"b\",\"b\":{},\"c\":{\"a\":\"b\",\"b\":[1,2],\"c\":[]}}"}`, `{
+  "foo": "{\"a\":\"b\",\"b\":{},\"c\":{\"a\":\"b\",\"b\":[1,2],\"c\":[]}}"
+}`, "pretty"},
 		// check invalid spaces between elements are preserved
 		{`{"foo":[1 2, 3]}`, `{"foo":[1 2,3]}`, "compact"},
 		{`{"foo":[1 true, 3]}`, `{"foo":[1 true,3]}`, "compact"},
